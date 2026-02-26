@@ -3,15 +3,17 @@ import { useState,useRef,useEffect } from "react"
 function Input(){
     const [songsList,setSongsList] = useState(null);
 
-    const [Song , setSong] = useState("") //useState() used to set the selected song
+    const [Song , setSong] = useState({ URL :  "" , "index" : null}) 
+
+    const labelRef = useRef(null)
 
     const songRef = useRef(null)
     
-    const [songName, setsongName] = useState("-Please choose a song-") //useState() to change the name of the song on the Site
+    const [songName, setsongName] = useState("-Please choose a song-") 
 
     function setAnotherSong(i){
         const newSongURL = URL.createObjectURL(songsList[i])
-        setSong(newSongURL)
+        setSong({URL : newSongURL,index : i})
         setsongName(songsList[i].name.slice(0,-4))
 
     }
@@ -27,7 +29,7 @@ function Input(){
     function songReset(){
         songRef.current.pause()
         setSongsList(null)
-        setSong("");
+        setSong({URL : "", index : null});
         setsongName("-Please choose a song-")
     }
 
@@ -35,14 +37,20 @@ function Input(){
         if(songRef.current != null) {
             console.log(Song)
             songRef.current.play();
+            labelRef.current.scrollIntoView({
+                behaviour : "smooth",
+                block : "center"
+            })
         }
+
+        console.log(labelRef)
 
         return () => {
         if (Song) {
             URL.revokeObjectURL(Song);
         }
     };
-    } , [Song]);
+    } , [Song.URL]);
 
     function ChangeSong(e){
         const files = Array.from(e.target.files)
@@ -54,7 +62,7 @@ function Input(){
         if (file) {
             const songURL = URL.createObjectURL(file);
             setsongName(file.name.slice(0,-4))
-            setSong(songURL)
+            setSong({URL : songURL, index : 0})
         }
     } 
 
@@ -75,8 +83,8 @@ function Input(){
                 
             </div>
                 {
-                    Song && <>
-                     <audio ref={songRef} className="rounded-md hover:cursor-pointer bg-white " src={Song} controls></audio> 
+                    Song.URL && <>
+                     <audio ref={songRef} className="rounded-md hover:cursor-pointer bg-white " onEnded={()=> setAnotherSong(Song.index + 1)} src={Song.URL} controls></audio> 
                      <div className="flex flex-row gap-3">
                         <button onClick={(e) => songPause(e)}>Pause</button>
                         <button onClick={(e) => songPlay(e)}>Play</button>
@@ -90,7 +98,7 @@ function Input(){
             <div className="border overflow-auto h-130 rounded-2xl">
             <ul className="flex py-3 px-10 flex-col gap-6">
             {songsList.map( (item,index) => {
-                return <li className="flex justify-center items-center text-xl hover:cursor-pointer" onClick={() => setAnotherSong(index)} key={index}>{item.name.slice(0,-4)}</li>
+                return <li ref={Song.index == index ? labelRef : null} className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`} onClick={() => setAnotherSong(index)} key={index}>{item.name.slice(0,-4)}</li>
             })}
             </ul>
         </div>
