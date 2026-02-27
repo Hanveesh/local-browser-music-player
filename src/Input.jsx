@@ -87,6 +87,10 @@ function Input() {
     function RemoveSong(i){
         let len = songsList.length
 
+        if(len == 1){
+            songReset();
+            return
+        }
         const Name = songsList[i].name
         
 
@@ -101,7 +105,7 @@ function Input() {
         }
 
         setSongsList(songsList.filter((w) =>w.name != Name))
-        setSong(p =>({...p,index:i}))
+        setSong(p =>({...p,index : (i < p.index) ? p.index - 1  : p.index }))
 
     }
 
