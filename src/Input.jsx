@@ -84,6 +84,19 @@ function Input() {
         };
     }, [Song.URL]);
 
+    function RemoveSong(i){
+        setSong(Song.URL,-1);
+        const Name = songsList[i].name
+        if(Name == songsList[Song.index].name) {
+            songRef.current.pause();
+            const newSongURL = URL.createObjectURL(songsList[i + 1])
+            setsongName(songsList[i+1].name.slice(0, -4))
+            setSong({ URL: newSongURL, index:i })
+
+        }
+        setSongsList(songsList.filter((w) =>w.name != Name))
+    }
+
     function ChangeSong(e) {
         const files = Array.from(e.target.files)
         const file = e.target.files[0]
@@ -137,7 +150,8 @@ function Input() {
                     <div className="border overflow-auto h-130 rounded-2xl">
                         <ul className="flex py-3 px-10 flex-col gap-6">
                             {songsList.map((item, index) => {
-                                return <li ref={Song.index == index ? labelRef : null} className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`} onClick={() => setAnotherSong(index)} key={index}>{item.name.slice(0, -4)}</li>
+                                return <div key={index} className="flex gap-5 justify-center items-center"> <li ref={Song.index == index ? labelRef : null} className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`} onClick={() => setAnotherSong(index)}>{item.name.slice(0, -4)}</li> 
+                                <button className="ml-auto" onClick={() => RemoveSong(index)}>-</button>  </div>
                             })}
                         </ul>
                     </div>
