@@ -27,12 +27,12 @@ function Input() {
 
     function songPause(e) {
         if (songRef.current.paused) {
-            setPlayingState("Pause+")
+            setPlayingState("Pause")
             console.log(songRef.current.paused)
             songRef.current.play()
         }
         else {
-            setPlayingState("Pause")
+            setPlayingState("Play")
             songRef.current.pause()
         }
     }
@@ -85,16 +85,24 @@ function Input() {
     }, [Song.URL]);
 
     function RemoveSong(i){
-        setSong(Song.URL,-1);
+        let len = songsList.length
+
         const Name = songsList[i].name
+        
+
         if(Name == songsList[Song.index].name) {
             songRef.current.pause();
-            const newSongURL = URL.createObjectURL(songsList[i + 1])
-            setsongName(songsList[i+1].name.slice(0, -4))
-            setSong({ URL: newSongURL, index:i })
-
+            const newSongURL = URL.createObjectURL(songsList[i == len-1 ?0 : (i + 1) ])
+            setsongName(songsList[i == len-1 ?0 : (i + 1)].name.slice(0, -4))
+            setSong({ URL: newSongURL, index: i ==len-1?0 : i })
+            setSongsList(songsList.filter((w) =>w.name != Name))
+            
+            return
         }
+
         setSongsList(songsList.filter((w) =>w.name != Name))
+        setSong(p =>({...p,index:i}))
+
     }
 
     function ChangeSong(e) {
@@ -133,7 +141,7 @@ function Input() {
                     </div>
                     {
                         Song.URL && <>
-                            <audio ref={songRef} className="rounded-md hover:cursor-pointer bg-white " onEnded={() => setAnotherSong(Song.index + 1)} src={Song.URL} controls></audio>
+                            <audio ref={songRef} className="rounded-md hover:cursor-pointer bg-white " onEnded={() => setAnotherSong((Song.index + 1)%songsList.length)} src={Song.URL} controls></audio>
                             <div className="flex flex-row gap-3">
                                 <button onClick={(e) => songPause(e)}>{PlayingState}</button>
                                 <button onClick={(e) => songReset(e)}>Reset</button>
