@@ -21,6 +21,35 @@ function Input() {
     const [songName, setsongName] = useState("-Please choose a song-")
 
 
+    function swap(tempArray,i,j){
+        [tempArray[i],tempArray[j]] = [tempArray[j],tempArray[i]];
+        return tempArray;
+    }
+
+    function shuffleSongsList(){
+        let j = 0;
+
+        setSongsList((p) => {
+
+            const songName = songsList[Song.index].name
+            let ind = Song.index
+            console.log(ind)
+
+            let tempArray = [...p];
+                for (let i = 0;i < songsList.length ;i++){
+
+                    j = Math.round((Math.random()*(songsList.length - 1)) )
+                    tempArray = swap(tempArray,i,j)
+                }
+
+            ind = tempArray.findIndex(p => p.name === songName )
+            setSong((p) =>({ ...p,index: ind}))
+                
+            return tempArray;
+        })
+        
+    }
+
     function changeRandom(){
         console.log(refRandom)
         if (random) {
@@ -191,13 +220,18 @@ function Input() {
                     <div className="border overflow-auto h-130 rounded-2xl">
                         <ul className="flex py-3 px-10 flex-col gap-6">
                             {songsList.map((item, index) => {
-                                return <div key={index} className="flex gap-5 justify-center items-center"> <li ref={Song.index == index ? labelRef : null} className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`} onClick={() => setAnotherSong(index,true)}>{item.name.slice(0, -4)}</li> 
+                                return <div key={index} className="flex gap-5 justify-center items-center">
+                                     <li ref={Song.index == index ? labelRef : null}
+                                     className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`}
+                                      onClick={() => setAnotherSong(index,true)}>
+                                        {item.name.slice(0, -4)}
+                                     </li> 
                                 <button className="ml-auto" onClick={() => RemoveSong(index)}>-</button>  </div>
                             })}
                         </ul>
                         
                     </div>
-                    <button>Shuffle</button>
+                    <button onClick={shuffleSongsList}>Shuffle</button>
                 </div>
                 </>}
             </div>
