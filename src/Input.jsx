@@ -16,6 +16,8 @@ function Input() {
 
     const ProgressBarRef = useRef(null)
 
+    const AddSongref = useRef(null)
+
     const songRef = useRef(null)
 
     const [songName, setsongName] = useState("-Please choose a song-")
@@ -33,7 +35,6 @@ function Input() {
 
             const songName = songsList[Song.index].name
             let ind = Song.index
-            console.log(ind)
 
             let tempArray = [...p];
                 for (let i = 0;i < songsList.length ;i++){
@@ -51,7 +52,6 @@ function Input() {
     }
 
     function changeRandom(){
-        console.log(refRandom)
         if (random) {
             refRandom.current.className = "randomBTN"
             setRandom(false)
@@ -66,12 +66,11 @@ function Input() {
 
     function setAnotherSong(i,Pressed = false) {
         i = i % songsList.length ;
+        i = (i === -1) ? songsList.length-1 : i;
         if(!Pressed){
             if(random){
-                
+                console.log("Random is On")
                 i = Math.round(Math.random() * songsList.length)
-                console.log(i)
-                console.log(random  + i )
 
             }
         }
@@ -85,7 +84,6 @@ function Input() {
     function songPause(e) {
         if (songRef.current.paused) {
             setPlayingState("Pause")
-            console.log(songRef.current.paused)
             songRef.current.play()
         }
         else {
@@ -96,10 +94,12 @@ function Input() {
 
 
     function songReset() {
-        songRef.current.pause()
-        setSongsList(null)
-        setSong({ URL: "", index: null });
-        setsongName("-Please choose a song-")
+        // songRef.current.pause()
+        // setSongsList(null)
+        // setSong({ URL: "", index: null });
+        // setsongName("-Please choose a song-")
+
+        songRef.current.currentTime = 0;
     }
 
 
@@ -109,7 +109,6 @@ function Input() {
 
         if (!audio || !bar) return;
 
-        console.log("Added Listnter")
 
         function updateBar() {
             if (audio.duration) {
@@ -166,7 +165,7 @@ function Input() {
 
     }
 
-    function ChangeSong(e) {
+    function UploadSong(e) {
         const files = Array.from(e.target.files)
         const file = e.target.files[0]
         if (files) {
@@ -180,6 +179,13 @@ function Input() {
         }
     }
 
+    function AddSong(e) {
+        const files = Array.from(e.target.files)
+        if(files.length > 0) {
+            setSongsList((p) => [...p,...files])
+            console.log("Added")
+        }
+    }
 
     function ChangeTime(e) {
         songRef.current.currentTime = ((e.target.value / 100) * songRef.current.duration)
@@ -192,7 +198,7 @@ function Input() {
 
                 <div className="flex flex-col gap-5 border p-30 rounded-2xl bg-[#292929] justify-center items-center">
 
-                    <input className="hidden" onChange={e => ChangeSong(e)} id="songs_input" type="file" accept="audio/*" multiple />
+                    <input className="hidden" onChange={e => UploadSong(e)} id="songs_input" type="file" accept="audio/*" multiple />
 
                     <label htmlFor="songs_input" className="h-10 w-20 border bg-white text-[#292929]  rounded flex justify-center items-center hover:scale-130 hover:cursor-pointer transition ease-in duration-150"  >Upload</label>
 
@@ -209,10 +215,11 @@ function Input() {
                                 <button ref={refRandom} className="randomBTN" onClick={()=> changeRandom()}>Random</button>
                             </div>
 
-                            <div className="flex flex-col">
+                            <div className="flex flex-col justify-center items-center">
                                 <input className="w-70 " ref={ProgressBarRef} id="progress-bar" type="range" onClick={(e) => { ChangeTime(e) }} min={0} max={100} step={0.01}></input>
-                                <div>
-                                <button className="w-50" onClick={() => setAnotherSong(Song.index+1,true)}>NEXT</button>
+                                <div className="flex flex-row gap-10 mt-8">
+                                <button className="w-20" onClick={() => setAnotherSong(Song.index-1)}>PREV</button>
+                                <button className="w-20" onClick={() => setAnotherSong(Song.index+1)}>NEXT</button>
                                 </div>
                             </div>
 
@@ -223,12 +230,13 @@ function Input() {
                 <div className="flex flex-col gap-4">
                     <div className="border overflow-auto h-130 rounded-2xl">
                         <ul className="flex py-3 px-10 flex-col gap-6">
+                            
                             {songsList.map((item, index) => {
                                 return <div key={index} className="flex gap-5 justify-center items-center">
                                      <li ref={Song.index == index ? labelRef : null}
                                      className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`}
                                       onClick={() => 
-                                      (index,true)}>
+                                      setAnotherSong(index,true)}>
                                         {item.name.slice(0, -4)}
                                      </li> 
                                 <button className="ml-auto" onClick={() => RemoveSong(index)}>-</button>  </div>
@@ -236,7 +244,12 @@ function Input() {
                         </ul>
                         
                     </div>
+                    <div className="flex flex-row justify-center align-center gap-10" >
                     <button onClick={shuffleSongsList}>Shuffle</button>
+                    <input className="hidden" ref={AddSongref} onChange={(e) => AddSong(e)} type="file" multiple></input>
+                    <button onClick={(e) => {AddSongref.current.click();}}>Add</button>                           
+                    </div>
+
                 </div>
                 </>}
             </div>
