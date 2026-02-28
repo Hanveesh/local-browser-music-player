@@ -65,6 +65,7 @@ function Input() {
     }
 
     function setAnotherSong(i,Pressed = false) {
+        i = i % songsList.length ;
         if(!Pressed){
             if(random){
                 
@@ -208,8 +209,11 @@ function Input() {
                                 <button ref={refRandom} className="randomBTN" onClick={()=> changeRandom()}>Random</button>
                             </div>
 
-                            <div>
-                                <input className="w-70b " ref={ProgressBarRef} id="progress-bar" type="range" onClick={(e) => { ChangeTime(e) }} min={0} max={100} step={0.01}></input>
+                            <div className="flex flex-col">
+                                <input className="w-70 " ref={ProgressBarRef} id="progress-bar" type="range" onClick={(e) => { ChangeTime(e) }} min={0} max={100} step={0.01}></input>
+                                <div>
+                                <button className="w-50" onClick={() => setAnotherSong(Song.index+1,true)}>NEXT</button>
+                                </div>
                             </div>
 
                         </>
@@ -223,7 +227,8 @@ function Input() {
                                 return <div key={index} className="flex gap-5 justify-center items-center">
                                      <li ref={Song.index == index ? labelRef : null}
                                      className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`}
-                                      onClick={() => setAnotherSong(index,true)}>
+                                      onClick={() => 
+                                      (index,true)}>
                                         {item.name.slice(0, -4)}
                                      </li> 
                                 <button className="ml-auto" onClick={() => RemoveSong(index)}>-</button>  </div>
