@@ -2,6 +2,10 @@ import { useState, useRef, useEffect } from "react"
 
 function Input() {
 
+    const refRandom = useRef(null)
+
+    const [random, setRandom] = useState(false)
+
     const [songsList, setSongsList] = useState(null);
 
     const [PlayingState, setPlayingState] = useState("Pause")
@@ -17,14 +21,37 @@ function Input() {
     const [songName, setsongName] = useState("-Please choose a song-")
 
 
+    function changeRandom(){
+        console.log(refRandom)
+        if (random) {
+            refRandom.current.className = "randomBTN"
+            setRandom(false)
+        }
+        else {
+            refRandom.current.className = "trueBTN"
+            console.log(refRandom.current.className)
+            setRandom(true)
+        }
+        
+    }
 
-    function setAnotherSong(i) {
+    function setAnotherSong(i,Pressed = false) {
+        if(!Pressed){
+            if(random){
+                
+                i = Math.round(Math.random() * songsList.length)
+                console.log(i)
+                console.log(random  + i )
+
+            }
+        }
         const newSongURL = URL.createObjectURL(songsList[i])
         setSong({ URL: newSongURL, index: i })
         setsongName(songsList[i].name.slice(0, -4))
 
     }
 
+    
     function songPause(e) {
         if (songRef.current.paused) {
             setPlayingState("Pause")
@@ -149,6 +176,7 @@ function Input() {
                             <div className="flex flex-row gap-3">
                                 <button onClick={(e) => songPause(e)}>{PlayingState}</button>
                                 <button onClick={(e) => songReset(e)}>Reset</button>
+                                <button ref={refRandom} className="randomBTN" onClick={()=> changeRandom()}>Random</button>
                             </div>
 
                             <div>
@@ -159,14 +187,18 @@ function Input() {
                     }
                 </div>
                 {songsList && <>
+                <div className="flex flex-col gap-4">
                     <div className="border overflow-auto h-130 rounded-2xl">
                         <ul className="flex py-3 px-10 flex-col gap-6">
                             {songsList.map((item, index) => {
-                                return <div key={index} className="flex gap-5 justify-center items-center"> <li ref={Song.index == index ? labelRef : null} className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`} onClick={() => setAnotherSong(index)}>{item.name.slice(0, -4)}</li> 
+                                return <div key={index} className="flex gap-5 justify-center items-center"> <li ref={Song.index == index ? labelRef : null} className={`flex justify-center ${Song.index == index ? "text-green-500" : null} items-center text-xl hover:cursor-pointer`} onClick={() => setAnotherSong(index,true)}>{item.name.slice(0, -4)}</li> 
                                 <button className="ml-auto" onClick={() => RemoveSong(index)}>-</button>  </div>
                             })}
                         </ul>
+                        
                     </div>
+                    <button>Shuffle</button>
+                </div>
                 </>}
             </div>
         </>

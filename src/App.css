@@ -42,3 +42,11 @@
 .read-the-docs {
   color: #888;
 }
+
+.trueBTN{
+  background-color: green;
+}
+
+.randomBTN:hover {
+  background-color: green;
+}
